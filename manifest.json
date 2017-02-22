@@ -4,7 +4,7 @@
   "version": "1.0",
   "permissions": [
     "activeTab",
-    "http://boilerpipe-web.appspot.com/"
+    "https://boilerpipe-web.appspot.com/"
   ],
   "background": {
     "scripts": ["background.js"],
