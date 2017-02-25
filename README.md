@@ -4,7 +4,7 @@
 
 1. Clone this repo
 2. In Chrome, navigate to `chrome://extensions/`. Make sure the "Developer mode" checkbox is checked
-3. Click "Load unpacked extension..." and navigate to the directory containing the repo's files
+3. Click "Load unpacked extension..." and navigate to the repo's frontend/ subdirectory
 
 ## Project status
 
