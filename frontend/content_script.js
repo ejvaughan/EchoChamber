@@ -7,20 +7,20 @@
 function findHeader(text){
   var header =  $("h1:contains('" + text  + "')");
   console.log(header);
-  return header 
+  return header;
 }
 var serviceUrl = "http://localhost:5000/article";
 url = {'article': document.URL};
 jQuery.post(serviceUrl, url, function(res) {
 	res = JSON.parse(res);
-  var score = res['score'];
-	console.log(score)
-	console.log(res['title'])
-  var title = findHeader(res['title'])
-  console.log(title)
-  if (title !== null) {
+  	var score = res['score'];
+	console.log(score);
+	console.log(res['title']);
+  	var title = findHeader(res['title']);
+  	console.log(title);
+  	if (title !== null) {
 		title.text(title.text() + " Score: " + score);
-  } else {
-    alert(" Score: " + score)
+  	} else {
+    		alert(" Score: " + score);
 	}
 });
