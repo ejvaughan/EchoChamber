@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
+from flask.json import jsonify
 import pickle
 import csv
 from newspaper import Article
@@ -17,9 +18,10 @@ def score():
     text = str(a.text)
     clf = joblib.load('model.p')
     s = pickle.dumps(clf)
-    # text = request.form['article']
     pred = clf.predict([text])[0].item() # Return singular result
-    return "Liberal" if pred else "Conservative"
+    score =  "Liberal" if pred else "Conservative"
+    title = a.title
+    return jsonify({'score': score, 'title' : title})
 
 if __name__ == "__main__":
     app.run()
