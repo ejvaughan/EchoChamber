@@ -9,6 +9,7 @@
 ## Project status
 
 The extension can currently predict if an article should be classified as "Conservative" or "Liberal", which are essentially aliases for classification for similarity to Guardian or Breitbart articles. The extension then inserts this into the headline.
+
 1. Adds a button to the Chrome browser UI which, when clicked, injects a script (`content_script.js`) into the webpage
 2. The script makes an POST request to a local Flask server, sending the URL.
 3. The Flask server uses the newspaper module to parse the text of the header and to get the text.
