@@ -8,8 +8,9 @@
 
 ## Project status
 
-Right now, this extension is pretty useless, as the backend that runs the ML algorithm is not yet implemented. It currently has the following functionality
-
+The extension can currently predict if an article should be classified as "Conservative" or "Liberal", which are essentially aliases for classification for similarity to Guardian or Breitbart articles. The extension then inserts this into the headline.
 1. Adds a button to the Chrome browser UI which, when clicked, injects a script (`content_script.js`) into the webpage
-2. The script makes an AJAX request to the [boilerpipe](https://boilerpipe-web.appspot.com/) web API to get the raw text of the article. boilerpipe's algorithms can determine what part of the HTML document contains the actual article text, which is all that we care about.
-3. Once the article text has been retrieved, the script modifies the DOM to append the word count to the article's title
+2. The script makes an POST request to a local Flask server, sending the URL.
+3. The Flask server uses the newspaper module to parse the text of the header and to get the text.
+4. The server then feeds the text through the trained model and returns the predicted label for the text as well as the header text.
+5. The extension then uses JQuery to find the headline and inserts the score into the DOM. If the headline cannot be found, it will send an alert to show the score.
