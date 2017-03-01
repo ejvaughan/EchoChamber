@@ -7,7 +7,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+import pickle
+import timeit
 
+start = timeit.default_timer()
 # load guardian.csv and breitbart.csv files and construct the data set
 breitbart_articles = []
 guardian_articles = []
@@ -26,6 +29,7 @@ with open('guardian.csv', newline='') as f:
 	guardian_articles = [ article[1] for article in reader ]
 
 articles = breitbart_articles + guardian_articles
+
 labels = ([0] * len(breitbart_articles)) + ([1] * len(guardian_articles))
 
 print("# Breitbart articles: %i\n# Guardian articles: %i" % (len(breitbart_articles), len(guardian_articles)))
@@ -49,6 +53,8 @@ for param_name in sorted(parameters.keys()):
 
 # test on the test set
 y_predicted = gs_clf.predict(articles_test)
-
 # print the classification report
 print(metrics.classification_report(y_test, y_predicted, target_names=label_names))
+stop = timeit.default_timer()
+print(stop - start)
+pickle.dump( gs_clf, open( "../backend/model.p", "wb" ) )
