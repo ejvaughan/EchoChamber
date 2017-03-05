@@ -10,7 +10,7 @@ function findHeader(text){
     return header;
 }
 function getScore() {
-    var serviceUrl = "http://ec2-54-85-171-136.compute-1.amazonaws.com/article";
+    var serviceUrl = "http://ec2-34-200-199-209.compute-1.amazonaws.com";
     url = {'article': document.URL};
     jQuery.post(serviceUrl, url, function(res) {
         res = JSON.parse(res);
@@ -23,6 +23,6 @@ function getScore() {
             alert(" Score: " + score);
         }
     });
-    
+
 }
 getScore() // Have some sort of event listener to integrate the popup
