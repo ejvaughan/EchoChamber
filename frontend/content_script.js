@@ -5,22 +5,24 @@
 //  - json: A json object containing the API's response
 //
 function findHeader(text){
-  var header =  $("h1:contains('" + text  + "')");
-  console.log(header);
-  return header;
+    var header =  $("h1:contains('" + text  + "')");
+    console.log(header);
+    return header;
 }
-var serviceUrl = "http://localhost:5000/article";
-url = {'article': document.URL};
-jQuery.post(serviceUrl, url, function(res) {
-	res = JSON.parse(res);
-  	var score = res['score'];
-	console.log(score);
-	console.log(res['title']);
-  	var title = findHeader(res['title']);
-  	console.log(title);
-  	if (title !== null) {
-		title.text(title.text() + " Score: " + score);
-  	} else {
-    		alert(" Score: " + score);
-	}
-});
+function getScore() {
+    var serviceUrl = "http://ec2-54-85-171-136.compute-1.amazonaws.com/article";
+    url = {'article': document.URL};
+    jQuery.post(serviceUrl, url, function(res) {
+        res = JSON.parse(res);
+        var score = res['score'];
+        console.log(score)
+        var title = findHeader(res['title']);
+        if (title !== null) {
+            title.text(title.text() + " Score: " + score);
+        } else {
+            alert(" Score: " + score);
+        }
+    });
+    
+}
+getScore() // Have some sort of event listener to integrate the popup

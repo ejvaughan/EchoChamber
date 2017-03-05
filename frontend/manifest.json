@@ -1,10 +1,10 @@
 {
+
   "name": "Political Awareness",
   "description": "Become more politically aware. See where the articles you're reading fall on the political spectrum.",
   "version": "1.0",
   "permissions": [
-    "activeTab",
-    "https://boilerpipe-web.appspot.com/"
+    "activeTab"
   ],
   "background": {
     "scripts": ["background.js"],
@@ -15,7 +15,7 @@
     "matches": [ "http://*/*", "https://*/*"]
   }],
   "browser_action": {
-    "default_title": "Get score"
+    "default_popup": "popup.html"
   },
   "manifest_version": 2
 }
