@@ -5,8 +5,6 @@ from newspaper import Article
 import pickle
 import timeit
 
-
-
 app = Flask(__name__)
 CORS(app)
 

@@ -18,14 +18,11 @@ label_names = [ 'conservative', 'liberal' ]
 
 with open('breitbart.csv', newline='') as f:
 	reader = csv.reader(f)
-
 	next(reader) # skip the header
-
 	breitbart_articles = [ article[2] for article in reader ]
 
 with open('guardian.csv', newline='') as f:
 	reader = csv.reader(f)
-
 	guardian_articles = [ article[1] for article in reader ]
 
 articles = breitbart_articles + guardian_articles
