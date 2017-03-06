@@ -8,7 +8,7 @@
 
 ## Project status
 
-The extension can currently predict if an article should be classified as "Conservative" or "Liberal", which are essentially aliases for classification for similarity to Guardian or Breitbart articles(the two sources that the model is currently trained on).
+The extension can currently predict if an article should be classified as "Conservative" or "Liberal", which are essentially aliases for similarity to Guardian and Breitbart articles (the two sources that the model is currently trained on).
 
 1. Adds a button to the Chrome browser UI which, when clicked, makes a POST request to the backend for the score.
 2. The Flask backend uses the newspaper module to extract the plain text of the article.
