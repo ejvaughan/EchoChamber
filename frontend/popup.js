@@ -11,12 +11,14 @@ function getScore() {
             var score = res.score;
             console.log("Got score: " + score);
 
-            $("#score").text(score);
+            $("#loading").hide();
+            $("#score").text("Score: " + score);
         });
     });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Getting score...");
+    $("#loading").show();
     getScore();
 });
