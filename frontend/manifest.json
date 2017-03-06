@@ -8,6 +8,7 @@
     "https://allenhao.me/"
   ],
   "browser_action": {
+    "default_icon": "DonkeyElephant.png",
     "default_popup": "popup.html"
   },
   "manifest_version": 2
