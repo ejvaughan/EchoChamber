@@ -4,6 +4,7 @@
   "version": "1.0",
   "permissions": [
     "tabs",
+    "storage",
     "https://allenhao.me/"
   ],
   "browser_action": {
