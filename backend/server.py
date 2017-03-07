@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from flask.json import jsonify
 from newspaper import Article
+import db
 import pickle
 import timeit
 
@@ -12,14 +13,17 @@ CORS(app)
 def score():
     start = timeit.default_timer()
     url = request.form['article']
-    a = Article(url)
-    a.download()
-    a.parse()
-    text = a.text
-    clf = pickle.load(open('/home/allen/flaskapp/model.p', 'rb'))
-    pred = clf.predict([text])[0].item() # Return singular result
-    score =  "Liberal" if pred else "Conservative"
-    title = a.title
+    score, title = db.check(url) # Get cached results from tuple
+    if score == None:
+        a = Article(url)
+        a.download()
+        a.parse()
+        text = a.text
+        title = a.title
+        clf = pickle.load(open('/home/allen/flaskapp/model.p', 'rb'))
+        pred = clf.predict([text])[0].item() # Return singular result
+        score =  "Liberal" if pred else "Conservative"
+        db.cache(url, score, title)
     time = timeit.default_timer() - start
     return jsonify({'score': score, 'title' : title, 'time':time})
 
