@@ -3,6 +3,7 @@ import requests
 import re
 import sys
 import string
+from time import time
 
 def scrape(url):
 	# headers = {
@@ -13,11 +14,11 @@ def scrape(url):
 	# r = requests.get('https://mercury.postlight.com/parser?url=http://www.salon.com/2017/02/22/president-trumps-plan-to-round-up-the-undocumented-will-be-wonderful-for-private-prisons/', headers=headers)
 	# arr = r.content
 	# print arr
-
+	start = time()
 	# convert to Mercury URL
 	mercury_base = "https://mercury.postlight.com/amp?url="
 	mercury_url = mercury_base + url
-	print mercury_url
+	print(mercury_url)
 
 	# scrape article text using beautiful soup
 	text = ""
@@ -36,11 +37,7 @@ def scrape(url):
 	text = text.replace("\xe2\x80\x99", "\'") # keep single quotes FIX POSSIBLE BUG
 	text = text.decode("utf-8")
 	text = text.encode("ascii", "ignore") # remove all non-ascii characters
-
-	toReturn = {"date":str(date), "title":str(title), "text":text, "url":url}
-	print toReturn
+	stop = time() - start
+	toReturn = {"date":str(date), "title":str(title), "text":text, "url":url, 'time': stop}
+	print(toReturn)
 	return toReturn
-
-url = "http://www.cnn.com/2017/03/05/politics/trump-russia-fallout/index.html"
-# url = "http://www.breitbart.com/big-government/2017/02/24/donald-trump-thrills-conservatives-cpac/"
-scrape(url)
