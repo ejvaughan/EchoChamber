@@ -3,7 +3,11 @@ import requests
 import re
 import sys
 import string
+<<<<<<< Updated upstream:data/scrape/urlScraper.py
 from time import time
+=======
+import time
+>>>>>>> Stashed changes:data/urlScraper.py
 
 def scrape(url):
 	# headers = {
@@ -26,7 +30,10 @@ def scrape(url):
 	html = request.text
 	soup = BeautifulSoup(html, 'html.parser')
 	title = soup.find('h1', class_='hg-title').text # extract title
-	date = soup.find('time', class_='hg-pubdate').text # extract date
+	try:
+		date = soup.find('time', class_='hg-pubdate').text # extract date
+	except Exception,e:
+		date = ""
 	content = soup.find('div', class_='hg-article-body').find_all('p')
 	for tag in content:
 		parents = tag.findParents('footer')
@@ -41,3 +48,14 @@ def scrape(url):
 	toReturn = {"date":str(date), "title":str(title), "text":text, "url":url, 'time': stop}
 	print(toReturn)
 	return toReturn
+<<<<<<< Updated upstream:data/scrape/urlScraper.py
+=======
+
+# url = "http://www.cnn.com/2017/03/05/politics/trump-russia-fallout/index.html"
+url = "http://www.motherjones.com/politics/2017/02/cpac-alt-right-steve-bannon"
+# url = "http://www.breitbart.com/big-government/2017/02/24/donald-trump-thrills-conservatives-cpac/"
+start = time.time()
+scrape(url)
+end = time.time()
+print end - start
+>>>>>>> Stashed changes:data/urlScraper.py
