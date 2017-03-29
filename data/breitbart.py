@@ -42,9 +42,8 @@ def get_text(data):
     a.download()
     a.parse()
     text = a.text.replace("SIGN UP FOR OUR NEWSLETTER", "")
-    # print(text.replace("SIGN UP FOR OUR NEWSLETTER", ""))
     # text = a.text.encode('ascii', 'ignore').decode('ascii')
-    return {"url" : url, "author": author, "text": text} 
+    return {"url" : url, "author": author, "text": text}
 
 
 
