@@ -19,9 +19,9 @@ function checkHistory(countThreshold, propThreshold) {
         }
     });
 }
-function updateHistory(newscore){
+function updateHistory(side){
     // If new score is liberal, then increment value
-    var value = newscore == "Liberal" ? 1 : 0;
+    var value = side;
     chrome.storage.sync.get(["scoreTuple"], function(obj){
         // I can change this tuple to an object if that's better
         var tuple = obj['scoreTuple']
@@ -40,16 +40,18 @@ function getScore() {
     chrome.tabs.getSelected(null, function(tab) {
         var url = tab.url;
         console.log("Getting score for url: " + url);
-        var serviceUrl = "https://allenhao.me/article";
+        //var serviceUrl = "https://allenhao.me/article";
+        var serviceUrl = "http://localhost:5000/article";
         var data = {"article": url};
         jQuery.post(serviceUrl, data, function(res) {
             $("#loading").hide();
             res = JSON.parse(res);
             var score = res.score;
+            var side = res.side;
             console.log("Got score: " + score);
-            updateHistory(score);
+            updateHistory(side);
             $("#loading").hide();
-            $("#score").text("Score: " + score);
+            $("#score").text(toPercent(score) + "% probability of being "  + side);
         });
     });
 }
