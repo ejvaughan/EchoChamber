@@ -13,9 +13,9 @@ function checkHistory(countThreshold, propThreshold) {
         console.log(libProp)
         console.log(libProp > propThreshold)
         if(tuple[0] > countThreshold && libProp > propThreshold) {
-            $("#reminder").text(toPercent(libProp) + "% of your news has been liberal. Consider checking out the other side!");
+            //$("#reminder").text(toPercent(libProp) + "% of your news has been liberal. Consider checking out the other side!");
         } else if(tuple[0] > countThreshold && conProp > propThreshold) {
-            $("#reminder").text(toPercent(conProp) + "% of your news has been conservative. Consider checking out the other side!");
+            //$("#reminder").text(toPercent(conProp) + "% of your news has been conservative. Consider checking out the other side!");
         }
     });
 }
@@ -37,27 +37,22 @@ function updateHistory(side){
 }
 
 function getScore() {
-    chrome.tabs.getSelected(null, function(tab) {
-        var url = tab.url;
+        var url = window.location;
         console.log("Getting score for url: " + url);
         //var serviceUrl = "https://allenhao.me/article";
         var serviceUrl = "http://localhost:5000/article";
         var data = {"article": url};
-        jQuery.post(serviceUrl, data, function(res) {
-            $("#loading").hide();
-            res = JSON.parse(res);
-            var score = res.score;
-            var side = res.side;
-            console.log("Got score: " + score);
-            updateHistory(side);
-            $("#loading").hide();
-            $("#score").text(toPercent(score) + "% probability of being "  + side);
-        });
-    });
+
+        //jQuery.post(serviceUrl, data, function(res) {
+        //    res = JSON.parse(res);
+        //    var score = res.score;
+        //    var side = res.side;
+        //    console.log("Got score: " + score);
+        //    updateHistory(side);
+        //    $("#score").text(toPercent(score) + "% probability of being "  + side);
+        //});
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    checkHistory(2, .8)
-    console.log("Getting score...");
-    getScore();
-});
+//checkHistory(2, .8)
+console.log("Getting score...");
+getScore();
