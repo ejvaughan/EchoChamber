@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <style>
+        .bar text {
+            fill: #fff;
+            font: 10px sans-serif;
+        }
+        body {
+            background-color: #D0D0D0;
+        }
+        #date_range {
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+</head>
+<body>
+    <select id="date_range" align="center">
+        <option value="past_year">Article Score Distribution from the Past Year</option>
+        <option value="past_month">Article Score Distribution from the Past Month</option>
+        <option value="past_week">Article Score Distribution from the Past Week</option>
+        <option value="past_day">Article Score Distribution from the Past Day</option>
+    </select>
+
+    <svg width="1104" height="525" id="svg"></svg>
+
+    <script>
+        var num_days_from_today = function(d) {
+            var today = new Date();
+            console.log(today);
+            var diff = Math.abs(today.getTime() - d.getTime());
+            return diff / (1000 * 60 * 60 * 24);
+        };
+
+        var create_chart = function(cutoff) {
+            var formatCount = d3.format(",.0f");
+
+            var svg = d3.select("svg"),
+                margin = {top: 80, right: 0, bottom: 30, left: 120},
+                width = +svg.attr("width") - margin.left - margin.right,
+                height = +svg.attr("height") - margin.top - margin.bottom,
+                g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            d3.json("sample_data3.json", function(error, data) {
+                if (error) throw error;
+                console.log(data);
+
+                values = [];
+                var parseTime = d3.timeParse("%Y/%m/%d");
+
+                // loop through data, get all values within specified date range 
+                data.forEach(function(d) {
+                    d.date = parseTime(d.date);
+                    console.log(d.date);
+                    days = num_days_from_today(d.date);
+                    console.log(days);
+                    if (days <= cutoff) {
+                        values.push(d.score);
+                    }
+                });
+
+                console.log(values);
+
+                var x = d3.scaleLinear()
+                    .rangeRound([0, width]);
+
+                var histogram = d3.histogram()
+                    .domain(x.domain())
+                    .thresholds(x.ticks(10));
+
+                var bins = histogram(values);
+
+                var y = d3.scaleLinear()
+                    .domain([0, d3.max(bins, function(d) { return d.length; })])
+                    .range([height, 0]);
+
+                var bar = g.selectAll(".bar")
+                  .data(bins)
+                  .enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; });
+
+                bar.append("rect")
+                    .attr("x", 1.5)
+                    .attr("width", x(bins[0].x1) - x(bins[0].x0) - 1.5)
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .attr("fill", function(d) {
+                        if (d.x0 < 0.5) {   return "red";   }
+                        else {  return "blue";  }
+                    })
+                    .on("mouseover", function(d, i){
+                        d3.select(this).style("fill", "black");
+                    })
+                    .on("mouseout", function(){
+                        d3.select(this).style("fill", function(d) {
+                            if (d.x0 < 0.5) {   return "red";   }
+                            else {  return "blue";  }
+                        });
+                    });
+
+                bar.append("text")
+                    .attr("dy", ".75em")
+                    .attr("y", 6)
+                    .attr("x", (x(bins[0].x1) - x(bins[0].x0)) / 2)
+                    .attr("text-anchor", "middle")
+                    .text(function(d) { return formatCount(d.length); });
+
+                g.append("g")
+                    .attr("class", "axis axis--x")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+            });
+        }
+
+        create_chart(365);
+
+        $("#date_range").change(function() {
+            //$("#date_range option:selected").val();
+            value_selected = $(this).val();
+            console.log(value_selected);
+            $("#svg").html("");
+            switch(value_selected) {
+                case "past_day":
+                    create_chart(1);
+                    break;
+                case "past_week":
+                    create_chart(7);
+                    break;
+                case "past_month":
+                    create_chart(30);
+                    break;
+                default:
+                    create_chart(365);
+            }
+        });
+    </script>
+</body>
+</html>
