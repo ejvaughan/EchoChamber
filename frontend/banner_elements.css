@@ -1,10 +1,4 @@
-#ecbanner {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 50px;	
-
+body {
 	padding: 5px 10px 5px 10px;
 	line-height: 40px;
 
@@ -12,6 +6,7 @@
 
 	font-size: 14pt;
 	color: black;
+	border-top: 1px #d3d3d3;
 }
 
 #loading {
@@ -34,6 +29,7 @@
 	padding: 5px 10px 5px 10px;
 	line-height: 40px;
 
+	font-size: 12pt;
 	text-align: right;
 }
 

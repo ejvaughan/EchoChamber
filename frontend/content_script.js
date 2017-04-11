@@ -54,15 +54,27 @@ function getScore() {
 }
 
 function displayBanner() {
-	var loadingImageURL = chrome.runtime.getURL("loading.svg");
-	var closeImageURL = chrome.runtime.getURL("close.svg");
-	var dashboardURL = chrome.runtime.getURL("dashboard.html");
+	var box = Boundary.findBox("#ecbanner");
+	if (box.length == 0) {
+		var loadingImageURL = chrome.runtime.getURL("loading.svg");
+		var closeImageURL = chrome.runtime.getURL("close.svg");
 
-	if ($("#ecbanner").length == 0) {
-		var banner = $("<div id='ecbanner'><img id='loading' src='" + loadingImageURL + "'><span id='label'>Calculating score...</span><div id='rightContainer'><a id='dashboard'>Dashboard</a><img id='close' src='" + closeImageURL + "'></div></div>").css("display", "none").appendTo("body");
+		box = Boundary.createBox("ecbanner");
+		var frame = $("#ecbanner").css("display", "none");
 
-		$("#close").click(function() {
-			banner.fadeOut();
+		box.html("<img id='loading' src='" + loadingImageURL + "'>" + 
+			"<span id='label'>Calculating score...</span>" + 
+			"<div id='rightContainer'><a id='dashboard'>Open dashboard...</a>" + 
+			"<img id='close' src='" + closeImageURL + "'></div>");
+
+		Boundary.loadBoxCSS("#ecbanner", chrome.runtime.getURL("banner_elements.css"));
+
+		box.find("#close").click(function() {
+			frame.fadeOut();
+		});
+
+		box.find("#dashboard").click(function() {
+			chrome.runtime.sendMessage({ command: "openDashboard" });
 		});
 	}
 
