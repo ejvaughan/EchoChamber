@@ -53,6 +53,24 @@ function getScore() {
         //});
 }
 
-//checkHistory(2, .8)
+function displayBanner() {
+	var loadingImageURL = chrome.runtime.getURL("loading.svg");
+	var closeImageURL = chrome.runtime.getURL("close.svg");
+	var dashboardURL = chrome.runtime.getURL("dashboard.html");
+
+	if ($("#ecbanner").length == 0) {
+		var banner = $("<div id='ecbanner'><img id='loading' src='" + loadingImageURL + "'><span id='label'>Calculating score...</span><div id='rightContainer'><a id='dashboard'>Dashboard</a><img id='close' src='" + closeImageURL + "'></div></div>").css("display", "none").appendTo("body");
+
+		$("#close").click(function() {
+			banner.fadeOut();
+		});
+	}
+
+	$("#ecbanner").fadeIn();
+}
+
 console.log("Getting score...");
-getScore();
+//checkHistory(2, .8)
+//getScore();
+
+displayBanner();
