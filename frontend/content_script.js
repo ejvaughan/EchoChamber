@@ -37,50 +37,41 @@ function updateHistory(side){
 }
 
 function fetchScore(cachedArticles) {
-        var url = window.location;
+        var url = window.location.href;
 
         console.log("Getting score for url: " + url);
 
-	$.ajax({
-		dataType: "json",
-		url: "https://allenhao.me/article",
-		data: {
-			article: url
-		},
-		success: function(res) {
-		    	console.log("Got result: " + res);
+	$.getJSON("https://allenhao.me/article", {
+		article: url
+	}, function(res) {
+		console.log("Got result: " + res);
 
-		    	//updateHistory(side);
-			
-			// Scores are stored in the cache as probability of being liberal
-			var score = (res.side === "Conservative") ? 1 - res.score : res.score;
+		//updateHistory(side);
+		
+		// Scores are stored in the cache as probability of being liberal
+		var score = (res.side === "Conservative") ? 1 - res.score : res.score;
 
-			// Store in the locale cache
-			chrome.storage.sync.set({
-				"history": cachedArticles.concat({
-					url: url,
-					score: score,
-					date: Date.now()
-				})
-			}, function() {
-				console.log("Stored score in local cache");
-			});
+		// Store in the locale cache
+		chrome.storage.sync.set({
+			"history": cachedArticles.concat({
+				url: url,
+				score: score,
+				date: Date.now()
+			})
+		}, function() {
+			console.log("Stored score in local cache");
+		});
 
-			displayScore(score);
-		},
-		error: function(request, textStatus, errorThrown) {
-			console.log("Error retrieving score: " + textStatus + " " + errorThrown);
-		}
+		displayScore(score);
 	});
 }
 
 function displayScore(score) {
+	var percentage = ((score < 0.5) ? 1 - score : score) * 100;
+
 	var box = Boundary.findBox("#ecbanner");
-
-	box.find("#loading").hide();
-
-	var percentage = score * 100;
-	box.find("#label").text(percentage.toFixed(0) + "% change of being " + (score > 0.5) ? "liberal" : "conservative");
+	box.find("#loading").fadeOut()
+	box.find("#label").text(percentage.toFixed(0) + "% chance of being " + ((score > 0.5) ? "liberal" : "conservative"));
 }
 
 function displayBanner() {
@@ -99,6 +90,8 @@ function displayBanner() {
 
 		Boundary.loadBoxCSS("#ecbanner", chrome.runtime.getURL("banner_elements.css"));
 
+		box.find("#loading").hide();
+
 		// Set up event listeners
 		box.find("#close").click(function() {
 			frame.fadeOut();
@@ -109,29 +102,28 @@ function displayBanner() {
 		});
 	}
 
-	box.find("#loading").show();
-	box.find("#label").text("Calculating score...");
 	$("#ecbanner").fadeIn();
 	
 	// Check if we have a score for this article in the local cache
 	chrome.storage.sync.get("history", function(storage) {
-		var cachedArticles = storage.history;
-
-		var matchingArticle;
-		if (cachedArticles !== undefined) {
-			var matchingArticles = cachedArticles.filter(function(article) {
-				return article.url === window.location;
-			});
-
-			if (matchingArticles.length === 1) {
-				matchingArticle = matchingArticles[0];
-			}
+		console.log("Got storage: " + storage);
+		var cachedArticles = storage["history"];
+		if (cachedArticles === undefined) {
+			cachedArticles = [];
 		}
 
-		if (matchingArticle === undefined) {
-			fetchScore(cachedArticles);
+		var matchingArticles = cachedArticles.filter(function(article) {
+			return article.url === window.location.href;
+		});
+
+		if (matchingArticles.length === 1) {
+			console.log("Got result in cache");
+			displayScore(matchingArticles[0].score);
 		} else {
-			displayResult(matchingArticle.score);
+			box.find("#loading").show();
+			box.find("#label").text("Calculating score...");
+
+			fetchScore(cachedArticles);
 		}
 	});
 }
