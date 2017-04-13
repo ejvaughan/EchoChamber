@@ -14,36 +14,122 @@
             text-align: center;
             display: inline-block;
         }
+        .ticks {
+            font: 12px sans-serif;
+        }
+
+        .track,
+        .track-inset,
+        .track-overlay {
+            stroke-linecap: round;
+        }
+
+        .track {
+            stroke: #000;
+            stroke-opacity: 0.1;
+            stroke-width: 10px;
+        }
+
+        .track-inset {
+            stroke: blue;
+            stroke-width: 8px;
+        }
+
+        .track-overlay {
+            pointer-events: stroke;
+            stroke-width: 50px;
+            stroke: transparent;
+            cursor: ew-resize;
+        }
+
+        .handle {
+            fill: red;
+            stroke: #000;
+            stroke-opacity: 0.5;
+            stroke-width: 1.25px;
+        }
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 </head>
 <body>
-    <select id="date_range" align="center">
-        <option value="past_year">Article Score Distribution from the Past Year</option>
-        <option value="past_month">Article Score Distribution from the Past Month</option>
-        <option value="past_week">Article Score Distribution from the Past Week</option>
-        <option value="past_day">Article Score Distribution from the Past Day</option>
-    </select>
 
-    <svg width="1104" height="525" id="svg"></svg>
+    <svg width="1104" height="600" id="svg"></svg>
 
     <script>
-        var num_days_from_today = function(d) {
+
+        var slider_value = 0;
+
+        var options = ["Past Week", "Past Month", "Past 3 Months", "Past 6 Months", "Past Year"];
+
+        var svg = d3.select("svg"),
+            margin = {left: 370, right: 250},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height");
+
+        var x = d3.scaleLinear()
+            .domain([0, 4])
+            .range([0, width])
+            .clamp(true);
+
+        var slider = svg.append("g")
+            .attr("class", "slider")
+            .attr("transform", "translate(" + margin.left + "," + height / 20 + ")");
+
+        slider.append("line")
+            .attr("class", "track")
+            .attr("x1", x.range()[0])
+            .attr("x2", x.range()[1])
+          .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+            .attr("class", "track-inset")
+          .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+            .attr("class", "track-overlay")
+            .call(d3.drag()
+                .on("start.interrupt", function() { slider.interrupt(); })
+                .on("start drag", function() {
+                    var xVal = x.invert(d3.event.x);
+                    handle.attr("cx", x(xVal));
+                })
+                .on("start end", function() {
+                    var xVal = Math.round(x.invert(d3.event.x));
+                    handle.attr("cx", x(xVal));
+                    change_chart(xVal);
+                }));
+
+        slider.insert("g", ".track-overlay")
+            .attr("class", "ticks")
+            .attr("transform", "translate(0," + 18 + ")")
+          .selectAll("text")
+          .data(x.ticks(5))
+          .enter().append("text")
+            .attr("x", x)
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate(0," + 5 + ")")
+            .text(function(d) { return options[d]; });
+
+        var handle = slider.insert("circle", ".track-overlay")
+            .attr("class", "handle")
+            .attr("r", 9);
+            // .attr("height", 18)
+            // .attr("width", 5);
+
+        function num_days_from_today(d) {
             var today = new Date();
             console.log(today);
             var diff = Math.abs(today.getTime() - d.getTime());
             return diff / (1000 * 60 * 60 * 24);
         };
 
-        var create_chart = function(cutoff) {
+        function create_chart(cutoff) {
             var formatCount = d3.format(",.0f");
 
             var svg = d3.select("svg"),
-                margin = {top: 80, right: 0, bottom: 30, left: 120},
+                margin = {top: 100, right: 0, bottom: 50, left: 120},
                 width = +svg.attr("width") - margin.left - margin.right,
                 height = +svg.attr("height") - margin.top - margin.bottom,
-                g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                g = svg.append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                        .attr("id", "chart");
 
             d3.json("sample_data3.json", function(error, data) {
                 if (error) throw error;
@@ -89,16 +175,18 @@
                     .attr("width", x(bins[0].x1) - x(bins[0].x0) - 1.5)
                     .attr("height", function(d) { return height - y(d.length); })
                     .attr("fill", function(d) {
-                        if (d.x0 < 0.5) {   return "red";   }
-                        else {  return "blue";  }
+                        if (d.x0 > 0.6) {   return "red";   }
+                        else if (d.x0 < 0.4) {   return "blue"   }
+                        else {  return "purple";  }
                     })
                     .on("mouseover", function(d, i){
                         d3.select(this).style("fill", "black");
                     })
                     .on("mouseout", function(){
                         d3.select(this).style("fill", function(d) {
-                            if (d.x0 < 0.5) {   return "red";   }
-                            else {  return "blue";  }
+                            if (d.x0 > 0.6) {   return "red";   }
+                            else if (d.x0 < 0.4) {   return "blue"   }
+                            else {  return "purple";  }
                         });
                     });
 
@@ -112,31 +200,38 @@
                 g.append("g")
                     .attr("class", "axis axis--x")
                     .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(x));
+                    .call(d3.axisBottom(x))
+                    .append("text")
+                        .attr("transform", "translate(" + width/2 + "," + (29/32*margin.bottom) + ")")
+                        .attr("text-anchor", "middle")
+                        .style("fill", "black")
+                        .style("font-weight", "bold")
+                        .text("Percent Likelihood of being Conservative")
+                        .style("font-size","20");
             });
-        }
+        };
 
-        create_chart(365);
-
-        $("#date_range").change(function() {
-            //$("#date_range option:selected").val();
-            value_selected = $(this).val();
-            console.log(value_selected);
-            $("#svg").html("");
-            switch(value_selected) {
-                case "past_day":
-                    create_chart(1);
-                    break;
-                case "past_week":
+        function change_chart(slider_value) {
+            $("#chart").remove();
+            switch(slider_value) {
+                case 0:
                     create_chart(7);
                     break;
-                case "past_month":
+                case 1:
                     create_chart(30);
+                    break;
+                case 2:
+                    create_chart(90);
+                    break;
+                case 3:
+                    create_chart(180);
                     break;
                 default:
                     create_chart(365);
             }
-        });
+        };
+
+        create_chart(7);
     </script>
 </body>
 </html>
