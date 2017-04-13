@@ -12,6 +12,6 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.command === "openDashboard")
-	chrome.tabs.create({ url: "dashboard.html" });
+	chrome.tabs.create({ url: "Dashboard/dashboard.html" });
       sendResponse({success: true});
   });

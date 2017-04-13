@@ -36,39 +36,70 @@ function updateHistory(side){
     });
 }
 
-function getScore() {
+function fetchScore(cachedArticles) {
         var url = window.location;
-        console.log("Getting score for url: " + url);
-        //var serviceUrl = "https://allenhao.me/article";
-        var serviceUrl = "http://localhost:5000/article";
-        var data = {"article": url};
 
-        //jQuery.post(serviceUrl, data, function(res) {
-        //    res = JSON.parse(res);
-        //    var score = res.score;
-        //    var side = res.side;
-        //    console.log("Got score: " + score);
-        //    updateHistory(side);
-        //    $("#score").text(toPercent(score) + "% probability of being "  + side);
-        //});
+        console.log("Getting score for url: " + url);
+
+	$.ajax({
+		dataType: "json",
+		url: "https://allenhao.me/article",
+		data: {
+			article: url
+		},
+		success: function(res) {
+		    	console.log("Got result: " + res);
+
+		    	//updateHistory(side);
+			
+			// Scores are stored in the cache as probability of being liberal
+			var score = (res.side === "Conservative") ? 1 - res.score : res.score;
+
+			// Store in the locale cache
+			chrome.storage.sync.set({
+				"history": cachedArticles.concat({
+					url: url,
+					score: score,
+					date: Date.now()
+				})
+			}, function() {
+				console.log("Stored score in local cache");
+			});
+
+			displayScore(score);
+		},
+		error: function(request, textStatus, errorThrown) {
+			console.log("Error retrieving score: " + textStatus + " " + errorThrown);
+		}
+	});
+}
+
+function displayScore(score) {
+	var box = Boundary.findBox("#ecbanner");
+
+	box.find("#loading").hide();
+
+	var percentage = score * 100;
+	box.find("#label").text(percentage.toFixed(0) + "% change of being " + (score > 0.5) ? "liberal" : "conservative");
 }
 
 function displayBanner() {
 	var box = Boundary.findBox("#ecbanner");
 	if (box.length == 0) {
-		var loadingImageURL = chrome.runtime.getURL("loading.svg");
 		var closeImageURL = chrome.runtime.getURL("close.svg");
+		var loadingImageURL = chrome.runtime.getURL("loading.svg");
 
 		box = Boundary.createBox("ecbanner");
 		var frame = $("#ecbanner").css("display", "none");
 
-		box.html("<img id='loading' src='" + loadingImageURL + "'>" + 
-			"<span id='label'>Calculating score...</span>" + 
+		box.html("<img id='loading' src='" + loadingImageURL + "'>" +
+			"<span id='label'></span>" + 
 			"<div id='rightContainer'><a id='dashboard'>Open dashboard...</a>" + 
 			"<img id='close' src='" + closeImageURL + "'></div>");
 
 		Boundary.loadBoxCSS("#ecbanner", chrome.runtime.getURL("banner_elements.css"));
 
+		// Set up event listeners
 		box.find("#close").click(function() {
 			frame.fadeOut();
 		});
@@ -78,11 +109,32 @@ function displayBanner() {
 		});
 	}
 
+	box.find("#loading").show();
+	box.find("#label").text("Calculating score...");
 	$("#ecbanner").fadeIn();
+	
+	// Check if we have a score for this article in the local cache
+	chrome.storage.sync.get("history", function(storage) {
+		var cachedArticles = storage.history;
+
+		var matchingArticle;
+		if (cachedArticles !== undefined) {
+			var matchingArticles = cachedArticles.filter(function(article) {
+				return article.url === window.location;
+			});
+
+			if (matchingArticles.length === 1) {
+				matchingArticle = matchingArticles[0];
+			}
+		}
+
+		if (matchingArticle === undefined) {
+			fetchScore(cachedArticles);
+		} else {
+			displayResult(matchingArticle.score);
+		}
+	});
 }
 
-console.log("Getting score...");
-//checkHistory(2, .8)
-//getScore();
-
 displayBanner();
+
