@@ -2,6 +2,7 @@ import json
 import requests
 import datetime
 from selenium import webdriver
+from newspaper_parser import parse
 # from selenium.webdriver.common.keys import Key
 from bs4 import BeautifulSoup
 
@@ -42,5 +43,4 @@ for story in articles[1:]:
     urls.append({'url': url})
 
 driver.close()
-with open('foxnewsurls.json', 'w') as outfile:
-    json.dump(urls, outfile)
+parse(urls, 'foxnews.json')
