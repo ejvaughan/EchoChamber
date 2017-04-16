@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <style>
+        .bar text {
+            fill: #fff;
+            font: 10px sans-serif;
+        }
+        body {
+            background-color: #D0D0D0;
+        }
+        #date_range {
+            text-align: center;
+            display: inline-block;
+        }
+        .ticks {
+            font: 12px sans-serif;
+        }
+
+        .track,
+        .track-inset,
+        .track-overlay {
+            stroke-linecap: round;
+        }
+
+        .track {
+            stroke: #000;
+            stroke-opacity: 0.1;
+            stroke-width: 10px;
+        }
+
+        .track-inset {
+            stroke: blue;
+            stroke-width: 8px;
+        }
+
+        .track-overlay {
+            pointer-events: stroke;
+            stroke-width: 50px;
+            stroke: transparent;
+            cursor: ew-resize;
+        }
+
+        .handle {
+            fill: red;
+            stroke: #000;
+            stroke-opacity: 0.5;
+            stroke-width: 1.25px;
+        }
+    </style>
+    <script src="../d3.js"></script>
+    <script src="../boundary/jquery.js"></script>
+</head>
+<body>
+
+    <svg width="1104" height="600" id="svg"></svg>
+
+	<script src="dashboard.js"></script>
+</body>
+</html>
