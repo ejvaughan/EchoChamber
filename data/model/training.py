@@ -10,12 +10,11 @@ from sklearn import metrics
 import pickle
 import timeit
 import os
-from preprocess import preprocess # Use our preprocess script
 
 # load guardian.csv and breitbart.csv files and construct the data set
 label_names = [ 'conservative', 'liberal' ]
 
-path = '../files'
+path = '../files/training_files'
 articles, labels = [], []
 for filename in glob.glob(os.path.join(path, '*.json')):
 	print(filename)
@@ -28,14 +27,13 @@ for filename in glob.glob(os.path.join(path, '*.json')):
 
 	labels += [label] * len(data)
 
-print("Done preprocessing articles")
-articles_train, articles_test, y_train, y_test = train_test_split(articles, labels, test_size=0.25, random_state=None)
+articles_train, articles_test, y_train, y_test = train_test_split(articles, labels, test_size=0.20, random_state=None)
 
 # bag of bigrams with logistic regression
-pipeline = Pipeline([('vect', TfidfVectorizer(ngram_range=(1,2), stop_words='english', tokenizer=preprocess)), ('clf', SGDClassifier(loss='log'))])
+pipeline = Pipeline([('vect', TfidfVectorizer(ngram_range=(1,2), stop_words='english', min_df=0)), ('clf', SGDClassifier(loss='log'))])
 
 # tune the min_df and max_df hyperparameters
-parameters = {'vect__min_df': np.linspace(0, 0.05, 6), 'vect__max_df': np.linspace(0.95, 1, 6) }
+parameters = { 'vect__max_df': np.linspace(0.95, 1, 6) }
 gs_clf = GridSearchCV(pipeline, parameters, n_jobs=-1)
 # train the model
 print("Training article now")
