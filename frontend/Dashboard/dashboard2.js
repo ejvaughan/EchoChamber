@@ -1,60 +1,69 @@
-var cachedArticles = [	
-	{
-		"score":0.69,
-		"date":"2017/01/03",
-		"url":"cnn.com/article1"
-	},
-	{
-		"score":0.2,
-		"date":"2017/01/07",
-		"url":"foxnews.com/article1"
-	},
-	{
-		"score":0.4,
-		"date":"2017/01/16",
-		"url":"newyorkpost.com/article1"
-	},
-	{
-		"score":0.1,
-		"date":"2017/01/27",
-		"url":"breitbart.com/article1"
-	},
-	{
-		"score":0.62,
-		"date":"2017/02/12",
-		"url":"newyorktimes.com/article1"
-	},
-	{
-		"score":0.86,
-		"date":"2017/02/20",
-		"url":"salon.com/article1"
-	},
-	{
-		"score":0.56,
-		"date":"2017/03/21",
-		"url":"moderateLeft.com/article1"
-	},
-	{
-		"score":0.45,
-		"date":"2017/03/23",
-		"url":"moderateRight.com/article1"
-	},
-	{
-		"score":0.05,
-		"date":"2017/04/09",
-		"url":"farRight.com/article1"
-	},
-	{
-		"score":0.95,
-		"date":"2017/04/10",
-		"url":"farLeft.com/article1"
-	}	];
+// var cachedArticles = [	
+// 	{
+// 		"score":0.69,
+// 		"date":"2017/01/03",
+// 		"url":"cnn.com/article1"
+// 	},
+// 	{
+// 		"score":0.2,
+// 		"date":"2017/01/07",
+// 		"url":"foxnews.com/article1"
+// 	},
+// 	{
+// 		"score":0.4,
+// 		"date":"2017/01/16",
+// 		"url":"newyorkpost.com/article1"
+// 	},
+// 	{
+// 		"score":0.1,
+// 		"date":"2017/01/27",
+// 		"url":"breitbart.com/article1"
+// 	},
+// 	{
+// 		"score":0.62,
+// 		"date":"2017/02/12",
+// 		"url":"newyorktimes.com/article1"
+// 	},
+// 	{
+// 		"score":0.86,
+// 		"date":"2017/02/20",
+// 		"url":"salon.com/article1"
+// 	},
+// 	{
+// 		"score":0.56,
+// 		"date":"2017/03/21",
+// 		"url":"moderateLeft.com/article1"
+// 	},
+// 	{
+// 		"score":0.45,
+// 		"date":"2017/03/23",
+// 		"url":"moderateRight.com/article1"
+// 	},
+// 	{
+// 		"score":0.05,
+// 		"date":"2017/04/09",
+// 		"url":"farRight.com/article1"
+// 	},
+// 	{
+// 		"score":0.95,
+// 		"date":"2017/04/10",
+// 		"url":"farLeft.com/article1"
+// 	}	];
+
+var cachedArticles = []
 var slider_value = 0;
 
 var options = ["Past Week", "Past Month", "Past 3 Months", "Past 6 Months", "Past Year"];
+var colors = ["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]
+var color = d3.scaleLinear()
+    .domain([0, .1, .2, .3, .4, .5, .6, .7, .8, .9])
+    .range(["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]);
+
+var tooltip = d3.select("body").append("div")
+	.attr("class", "tooltip");
 
 var svg = d3.select("svg");
-var margin = {left: 370, right: 250};
+var margin = {left: 387, right: 233};
 var width = +svg.attr("width") - margin.left - margin.right;
 var height = +svg.attr("height");
 
@@ -96,6 +105,7 @@ slider.insert("g", ".track-overlay")
 		.attr("x", x)
     	.attr("text-anchor", "middle")
     	.attr("transform", "translate(0," + 5 + ")")
+    	.style("fill", "white")
     	.text(function(d) { return options[d]; });
 
 var handle = slider.insert("circle", ".track-overlay")
@@ -114,7 +124,7 @@ function create_chart(data, cutoff) {
     var formatCount = d3.format(",.0f");
 
     var svg = d3.select("svg"),
-	margin = {top: 100, right: 0, bottom: 60, left: 120},
+	margin = {top: 100, right: 0, bottom: 60, left: 160},
 	width = +svg.attr("width") - margin.left - margin.right,
 	height = +svg.attr("height") - margin.top - margin.bottom,
 	g = svg.append("g")
@@ -139,7 +149,7 @@ function create_chart(data, cutoff) {
 	console.log(values);
 
 	var x = d3.scaleLinear()
-	    .rangeRound([0, width]);
+	    .rangeRound([0, .99*width]);
 
 	var histogram = d3.histogram()
 	    .domain(x.domain())
@@ -149,7 +159,7 @@ function create_chart(data, cutoff) {
 
 	var y = d3.scaleLinear()
 	    .domain([0, d3.max(bins, function(d) { return d.length; })])
-	    .range([height, 0]);
+	    .range([height, .02*height]);
 
 	var bar = g.selectAll(".bar")
 		.data(bins)
@@ -157,24 +167,46 @@ function create_chart(data, cutoff) {
 			.attr("class", "bar")
 	    	.attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; });
 
+	var bin = 0;
+
 	bar.append("rect")
 	    .attr("x", 1.5)
-	    .attr("width", x(bins[0].x1) - x(bins[0].x0) - 1.5)
+	    .attr("width", x(bins[0].x1) - x(bins[0].x0) - 2)
 	    .attr("height", function(d) { return height - y(d.length); })
-		.attr("fill", function(d) {
-			if (d.x0 > 0.6) {   return "blue";   }
-			else if (d.x0 < 0.4) {   return "red"   }
-			else {  return "purple";  }
+		.attr("fill", function(d, i) {
+			// if (d.x0 > 0.6) {   return "blue";   }
+			// else if (d.x0 < 0.4) {   return "red"   }
+			// else {  return "purple";  }
+			return colors[i];
 	    })
 	    .on("mouseover", function(d, i){
+	    	bin = i;
 			d3.select(this).style("fill", "black");
+			var minI = i/10;
+			var maxI = (i+1)/10;
+			console.log("Range: " + minI + " to " + maxI);
+			var dataInRange = [];
+			data.forEach(function(d) {
+			    score = d.score;
+				if (d.score >= minI && d.score < maxI) {
+					// console.log(d);
+					dataInRange.push(d);
+				}
+			});
+			console.log(dataInRange);
+			// d3.select(this).append("text")
+			// 	.style("fill", "white")
+			// 	.text("TROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLL");
+			tooltip.style("visibility", "visible");
 	    })
 	    .on("mouseout", function(){
-			d3.select(this).style("fill", function(d) {
-			    if (d.x0 > 0.6) {   return "blue";   }
-			    else if (d.x0 < 0.4) {   return "red"   }
-			    else {  return "purple";  }
+			d3.select(this).style("fill", function(d, i) {
+			    // if (d.x0 > 0.6) {   return "blue";   }
+			    // else if (d.x0 < 0.4) {   return "red"   }
+			    // else {  return "purple";  }
+			    return colors[bin];
 			});
+			tooltip.style("visibility", "hidden");
 	    });
 
 	bar.append("text")
@@ -184,43 +216,70 @@ function create_chart(data, cutoff) {
 	    .attr("text-anchor", "middle")
 	    .text(function(d) { return formatCount(d.length); });
 
+	g.selectAll(".legend_rect")
+          .data(color.domain())
+        .enter().append("rect")
+          .attr("class", "legend_rect")
+          .attr("x", function(d, i) { return (.99*width/10)*(i); })
+          .attr("y", 1.05*height)
+          .attr("width", 100)
+          .attr("height", 10)
+          .style("fill", function(d, i) { return color(d); });
+
 	g.append("g")
-	    .attr("class", "axis axis--x")
+		.attr("class", "xAxis")
 	    .attr("transform", "translate(0," + height + ")")
 	    .call(d3.axisBottom(x))
 	    .append("text")
-			.attr("transform", "translate(" + width/2 + "," + (27/32*margin.bottom) + ")")
+			.attr("transform", "translate(" + .99*width/2 + "," + (31/32*margin.bottom) + ")")
 			.attr("text-anchor", "middle")
-			.style("fill", "black")
+			.style("fill", "white")
 			.style("font-weight", "bold")
-			.text("Percent Likelihood of Being Liberal")
+			//.text("Percent Likelihood of Being Liberal")
+			.text("Article Score")
 			.style("font-size","26");
 
-	g.append("g")
-	    .attr("class", "axis axis--y")
-	    .append("text")
-			.attr("y", -30)
-			.attr("x", -1*height/2)
-			.attr("transform", "rotate(-90)")
-			.attr("text-anchor", "middle")
-			.style("fill", "black")
-			.style("font-weight", "bold")
-			.text("Article Count")
-			.style("font-size","26");
+	g.append("g").append("text")
+		.attr("y", -30)
+		.attr("x", -1*height/2)
+		.attr("transform", "rotate(-90)")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.text("Article Count")
+		.style("font-size","26");
 
-	console.log("YO")!
+	g.append("g").append("text")
+		.attr("transform", "translate(" + .99*width/2 + "," + -1*(3/16*margin.bottom) + ")")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.text("What Am I Reading?")
+		.style("font-size","26");
 
 	g.append("g")
-	    .attr("class", "axis axis--x")
+		.attr("class", "xAxis")
 	    .attr("transform", "translate(0," + height + ")")
-	    .call(d3.axisTop(x))
+	    .call(d3.axisBottom(x))
 	    .append("text")
-			.attr("transform", "translate(" + width/2 + "," + (27/32*margin.bottom) + ")")
+			.attr("transform", "translate(" + width/20 + "," + (29/32*margin.bottom) + ")")
 			.attr("text-anchor", "middle")
-			.style("fill", "black")
+			.style("fill", "white")
 			.style("font-weight", "bold")
-			.text("Percent Likelihood of Being Liberal")
-			.style("font-size","26");
+			.text("Liberal")
+			.style("font-size","20");
+
+	g.append("g")
+		.attr("class", "xAxis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(d3.axisBottom(x))
+	    .append("text")
+			.attr("transform", "translate(" + .99*19*width/20 + "," + (29/32*margin.bottom) + ")")
+			.attr("text-anchor", "middle")
+			.style("fill", "white")
+			.style("font-weight", "bold")
+			.text("Conservative")
+			.style("font-size","18");
 };
 
 function change_chart(slider_value) {
@@ -243,14 +302,14 @@ function change_chart(slider_value) {
     }
 };
 
-create_chart(cachedArticles, 7);
+// create_chart(cachedArticles, 7);
 
-// // Fetch the articles from the locale cache
-// chrome.storage.sync.get("history", function(storage) {
-// 	cachedArticles = storage["history"];
-// 	if (cachedArticles === undefined) {
-// 		cachedArticles = [];
-// 	}
+// Fetch the articles from the locale cache
+chrome.storage.sync.get("history", function(storage) {
+	cachedArticles = storage["history"];
+	if (cachedArticles === undefined) {
+		cachedArticles = [];
+	}
 
-// 	create_chart(cachedArticles, 7);
-// });
+	create_chart(cachedArticles, 7);
+});

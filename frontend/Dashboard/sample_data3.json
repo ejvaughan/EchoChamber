@@ -1,52 +1,52 @@
 
 [	
 	{
-		"score":0.31,
+		"score":0.69,
 		"date":"2017/01/03",
 		"url":"cnn.com/article1"
 	},
 	{
-		"score":0.8,
+		"score":0.2,
 		"date":"2017/01/07",
 		"url":"foxnews.com/article1"
 	},
 	{
-		"score":0.6,
+		"score":0.4,
 		"date":"2017/01/16",
 		"url":"newyorkpost.com/article1"
 	},
 	{
-		"score":0.9,
+		"score":0.1,
 		"date":"2017/01/27",
 		"url":"breitbart.com/article1"
 	},
 	{
-		"score":0.38,
+		"score":0.62,
 		"date":"2017/02/12",
 		"url":"newyorktimes.com/article1"
 	},
 	{
-		"score":0.14,
+		"score":0.86,
 		"date":"2017/02/20",
 		"url":"salon.com/article1"
 	},
 	{
-		"score":0.44,
+		"score":0.56,
 		"date":"2017/03/21",
 		"url":"moderateLeft.com/article1"
 	},
 	{
-		"score":0.55,
+		"score":0.45,
 		"date":"2017/03/23",
 		"url":"moderateRight.com/article1"
 	},
 	{
-		"score":0.95,
+		"score":0.05,
 		"date":"2017/04/09",
 		"url":"farRight.com/article1"
 	},
 	{
-		"score":0.05,
+		"score":0.95,
 		"date":"2017/04/10",
 		"url":"farLeft.com/article1"
 	}
