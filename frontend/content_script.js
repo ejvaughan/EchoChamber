@@ -1,44 +1,46 @@
 function toPercent(prop) {
     return Math.round(prop * 100, 3);
 }
-function displayScore(score) {
+function displayScore(score, side) {
+    console.log(side)
 	var box = Boundary.findBox("#ecbanner");
-	var percentage = ((score < 0.5) ? 1 - score : score) * 100;
+	var percentage = toPercent(score)
 	box.find("#loading").fadeOut();
-    box.find("#label").text(percentage.toFixed(0) + "% chance of being " + ((score > 5) ? "liberal" : "conservative"));
+    box.find("#label").text(percentage.toFixed(0) + "% chance of being " + side);
+
 }
 
 
-function checkEcho(countThreshold, propThreshold, score) {
+function checkEcho(countThreshold, propThreshold, score, side) {
     chrome.storage.sync.get(["props"], function(storage){
         var box = Boundary.findBox("#ecbanner");
         var props = storage.props;
         if (props == undefined) { //Catch both undefined and nulls
         	props = { 
         		"totalCount" : 1,
-        		"libCount" : score > 5 ? 1 : 0
+        		"libCount" : side == 'liberal' ? 1 : 0
         	}
         } else {
         	props.totalCount++;
-        	props.libCount += score > 5 ? 1 : 0;
+        	props.libCount += side == 'liberal' ? 1 : 0;
         }
         var libProp = props.libCount / props.totalCount;
         var qualifiedCount = props.totalCount > countThreshold; // We only want to check periodically
         if(qualifiedCount && libProp > propThreshold) {
-            echomsg = toPercent(libProp) + "% of your news has been liberal. Consider checking out the other side!";
+            echomsg = "   " + toPercent(libProp) + "% of your news has been liberal. Consider checking out the other side!";
         } else if(qualifiedCount  && 1 - libProp > propThreshold) {
-            echomsg = toPercent(1 - libProp) + "% of your news has been conservative. Consider checking out the other side!";
+            echomsg = "   " + toPercent(1 - libProp) + "% of your news has been conservative. Consider checking out the other side!";
         } else {
             echomsg = null;
         }
         if (echomsg === null) { // Don't show the score
-        	displayScore(score);
+        	displayScore(score, side);
         } else {
             box.find("#loading").remove();
             box.find("#label").text(echomsg); 
             // TODO color the box so it POPS 
             setTimeout(function() {
-                displayScore(score) // Have to do it with anonymous function to pass score args
+                displayScore(score, side) // Have to do it with anonymous function to pass score args
             }, 3000);
             props = null; // unset props so we can keep track of next period
         }
@@ -57,13 +59,18 @@ function fetchScore() {
 	}, function(res) {
 		console.log("Got result: ");
         console.log(res);
-        var countThreshold = 5; // Number of articles before checking for echo chamber
+        var countThreshold = 20; // Number of articles before checking for echo chamber
 		var propThreshold = 0.5;
-        checkEcho(countThreshold, propThreshold, res.score);
+        checkEcho(countThreshold, propThreshold, res.score, res.side);
         chrome.storage.sync.get(["articles"], function(storage) {
             articles = storage.articles;
+            console.log(res.side);
+            if (res.side == 'liberal') { // Transform score for easier reading in viz
+                res.side = 1 - res.side;
+            }
+            console.log(res.side);
             var article = {
-                    'score' : res.score,
+                    'score' : res.score, // Store score as percentage of being conservative
                     'date' : Date.now()
             }
             if (articles === undefined) {
@@ -114,3 +121,4 @@ function displayBanner() {
 }
 
 displayBanner();
+// chrome.storage.sync.clear();
