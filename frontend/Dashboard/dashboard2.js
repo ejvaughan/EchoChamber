@@ -305,8 +305,8 @@ function change_chart(slider_value) {
 // create_chart(cachedArticles, 7);
 
 // Fetch the articles from the locale cache
-chrome.storage.sync.get("history", function(storage) {
-	cachedArticles = storage["history"];
+chrome.storage.sync.get("articles", function(storage) {
+	cachedArticles = storage["articles"];
 	if (cachedArticles === undefined) {
 		cachedArticles = [];
 	}
