@@ -66,9 +66,8 @@ function fetchScore() {
             articles = storage.articles;
             console.log(res.side);
             if (res.side == 'liberal') { // Transform score for easier reading in viz
-                res.side = 1 - res.side;
+                res.score = 1 - res.score;
             }
-            console.log(res.side);
             var article = {
                     'score' : res.score, // Store score as percentage of being conservative
                     'date' : Date.now()
