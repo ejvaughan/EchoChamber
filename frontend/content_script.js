@@ -92,7 +92,7 @@ function displayBanner() {
 
 		box = Boundary.createBox("ecbanner");
 		var frame = $("#ecbanner").css("display", "none");
-
+        
 		box.html("<img id='loading' src='" + loadingImageURL + "'>" +
 			"<span id='label'></span>" +
 			"<div id='rightContainer'><a id='dashboard'>Open dashboard...</a>" +

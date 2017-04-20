@@ -59,9 +59,6 @@ var color = d3.scaleLinear()
     .domain([0, .1, .2, .3, .4, .5, .6, .7, .8, .9])
     .range(["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]);
 
-var tooltip = d3.select("body").append("div")
-	.attr("class", "tooltip");
-
 var svg = d3.select("svg");
 var margin = {left: 387, right: 233};
 var width = +svg.attr("width") - margin.left - margin.right;
@@ -182,22 +179,21 @@ function create_chart(data, cutoff) {
 	    .on("mouseover", function(d, i){
 	    	bin = i;
 			d3.select(this).style("fill", "black");
-			var minI = i/10;
-			var maxI = (i+1)/10;
-			console.log("Range: " + minI + " to " + maxI);
-			var dataInRange = [];
-			data.forEach(function(d) {
-			    score = d.score;
-				if (d.score >= minI && d.score < maxI) {
-					// console.log(d);
-					dataInRange.push(d);
-				}
-			});
-			console.log(dataInRange);
+			// var minI = i/10;
+			// var maxI = (i+1)/10;
+			// console.log("Range: " + minI + " to " + maxI);
+			// var dataInRange = [];
+			// data.forEach(function(d) {
+			//     score = d.score;
+			// 	if (d.score >= minI && d.score < maxI) {
+			// 		// console.log(d);
+			// 		dataInRange.push(d);
+			// 	}
+			// });
+			// console.log(dataInRange);
 			// d3.select(this).append("text")
 			// 	.style("fill", "white")
 			// 	.text("TROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLL");
-			tooltip.style("visibility", "visible");
 	    })
 	    .on("mouseout", function(){
 			d3.select(this).style("fill", function(d, i) {
@@ -206,7 +202,6 @@ function create_chart(data, cutoff) {
 			    // else {  return "purple";  }
 			    return colors[bin];
 			});
-			tooltip.style("visibility", "hidden");
 	    });
 
 	bar.append("text")
