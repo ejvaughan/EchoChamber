@@ -130,18 +130,21 @@ function create_chart(data, cutoff) {
 
 	console.log(data);
 
-	values = [];
+	var values = [];
+	var sumValues = 0;
 
 	// loop through data, get all values within specified date range 
 	data.forEach(function(d) {
 	    d.date = new Date(d.date);
-	    // console.log(d.date);
 	    days = num_days_from_today(d.date);
-	    // console.log(days);
 	    if (days <= cutoff) {
 			values.push(d.score);
+			sumValues += d.score;
 	    }
 	});
+
+	var averageScore = (sumValues / values.length).toFixed(2);
+	console.log("Average Score: " + averageScore);
 
 	console.log(values);
 
@@ -170,12 +173,7 @@ function create_chart(data, cutoff) {
 	    .attr("x", 1.5)
 	    .attr("width", x(bins[0].x1) - x(bins[0].x0) - 2)
 	    .attr("height", function(d) { return height - y(d.length); })
-		.attr("fill", function(d, i) {
-			// if (d.x0 > 0.6) {   return "blue";   }
-			// else if (d.x0 < 0.4) {   return "red"   }
-			// else {  return "purple";  }
-			return colors[i];
-	    })
+		.attr("fill", function(d, i) {	return colors[i];	})
 	    .on("mouseover", function(d, i){
 	    	bin = i;
 			d3.select(this).style("fill", "black");
@@ -195,13 +193,8 @@ function create_chart(data, cutoff) {
 			// 	.style("fill", "white")
 			// 	.text("TROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLL");
 	    })
-	    .on("mouseout", function(){
-			d3.select(this).style("fill", function(d, i) {
-			    // if (d.x0 > 0.6) {   return "blue";   }
-			    // else if (d.x0 < 0.4) {   return "red"   }
-			    // else {  return "purple";  }
-			    return colors[bin];
-			});
+	    .on("mouseout", function(){	
+	    	d3.select(this).style("fill", function(d, i) {	return colors[bin];	});
 	    });
 
 	bar.append("text")
@@ -230,7 +223,6 @@ function create_chart(data, cutoff) {
 			.attr("text-anchor", "middle")
 			.style("fill", "white")
 			.style("font-weight", "bold")
-			//.text("Percent Likelihood of Being Liberal")
 			.text("Article Score")
 			.style("font-size","26");
 
@@ -273,8 +265,29 @@ function create_chart(data, cutoff) {
 			.attr("text-anchor", "middle")
 			.style("fill", "white")
 			.style("font-weight", "bold")
-			.text("Conservative")
-			.style("font-size","18");
+			.style("font-size","18")
+			.text("Conservative");
+
+	g.append("g").append("text")
+		.attr("transform", "translate(" + -width/20 + "," + -10/16*margin.top + ")")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.style("font-size","18")
+		.text("Average Score: \n " + averageScore);
+
+	g.append("g").append("text")
+		.attr("transform", "translate(" + -width/20 + "," + -7/16*margin.top + ")")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.style("font-size","18")
+		.text(function(i,d) {
+			if(averageScore < .35) { return "Liberal" }
+			else if(averageScore < .5) { return "Moderately Liberal" }
+			else if(averageScore < .65) { return "Moderately Conservative" }
+			else { return "Conservative" }
+		});
 };
 
 function change_chart(slider_value) {
@@ -305,6 +318,5 @@ chrome.storage.sync.get("articles", function(storage) {
 	if (cachedArticles === undefined) {
 		cachedArticles = [];
 	}
-
 	create_chart(cachedArticles, 7);
 });
