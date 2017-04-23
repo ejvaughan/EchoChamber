@@ -54,7 +54,7 @@ var cachedArticles = []
 var slider_value = 0;
 
 var options = ["Past Week", "Past Month", "Past 3 Months", "Past 6 Months", "Past Year"];
-var colors = ["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]
+// var colors = ["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]
 var color = d3.scaleLinear()
     .domain([0, .1, .2, .3, .4, .5, .6, .7, .8, .9])
     .range(["#063E78", "#08519C", "#3182BD", "#6BAED6", "#9ECAE1", "#FC9272", "#FB6A4A", "#DE2D26", "#A50F15", "#860308"]);
@@ -73,13 +73,13 @@ var slider = svg.append("g")
     .attr("class", "slider")
     .attr("transform", "translate(" + margin.left + "," + height / 20 + ")");
 
-slider.append("line")
+slider.append("line") // Slider Functionality
     	.attr("class", "track")
     	.attr("x1", x.range()[0])
     	.attr("x2", x.range()[1])
 	.select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
     	.attr("class", "track-inset")
-	 .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+	.select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
 	    .attr("class", "track-overlay")
 	    .call(d3.drag()
 		.on("start.interrupt", function() { slider.interrupt(); })
@@ -93,11 +93,11 @@ slider.append("line")
 		    change_chart(xVal);
 		}));
 
-slider.insert("g", ".track-overlay")
+slider.insert("g", ".track-overlay") // Slider Display
 		.attr("class", "ticks")
 		.attr("transform", "translate(0," + 18 + ")")
 	.selectAll("text")
-	.data(x.ticks(5))
+	.data(x.ticks(3))
 	.enter().append("text")
 		.attr("x", x)
     	.attr("text-anchor", "middle")
@@ -131,10 +131,9 @@ function create_chart(data, cutoff) {
 	console.log(data);
 
 	var values = [];
-	var sumValues = 0;
+	var sumValues = 0; // Use to calculate average score
 
-	// loop through data, get all values within specified date range 
-	data.forEach(function(d) {
+	data.forEach(function(d) { // loop through data, get all values within specified date range 
 	    d.date = new Date(d.date);
 	    days = num_days_from_today(d.date);
 	    if (days <= cutoff) {
@@ -167,16 +166,14 @@ function create_chart(data, cutoff) {
 			.attr("class", "bar")
 	    	.attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; });
 
-	var bin = 0;
-
-	bar.append("rect")
+	bar.append("rect") // Display Bars
 	    .attr("x", 1.5)
-	    .attr("width", x(bins[0].x1) - x(bins[0].x0) - 2)
+	    .attr("width", x(bins[0].x1) - x(bins[0].x0) + 0) // can change 0 to change space b/w bars
 	    .attr("height", function(d) { return height - y(d.length); })
-		.attr("fill", function(d, i) {	return colors[i];	})
+		// .attr("fill", function(d, i) {	return colors[i];	})
+		.attr("fill", function(d, i) {	return color(bins[i].x0);	})
 	    .on("mouseover", function(d, i){
-	    	bin = i;
-			d3.select(this).style("fill", "black");
+			d3.select(this).style("opacity", 0.7);
 			// var minI = i/10;
 			// var maxI = (i+1)/10;
 			// console.log("Range: " + minI + " to " + maxI);
@@ -193,19 +190,21 @@ function create_chart(data, cutoff) {
 			// 	.style("fill", "white")
 			// 	.text("TROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLLTROLLLL");
 	    })
-	    .on("mouseout", function(){	
-	    	d3.select(this).style("fill", function(d, i) {	return colors[bin];	});
-	    });
+	    .on("mouseout", function(){		d3.select(this).style("opacity", 1);	});
 
-	bar.append("text")
+	bar.append("text") // Display count of articles in bin
 	    .attr("dy", ".75em")
 	    .attr("y", 6)
 	    .attr("x", (x(bins[0].x1) - x(bins[0].x0)) / 2)
 	    .attr("text-anchor", "middle")
-	    .text(function(d) { return formatCount(d.length); });
+	    .text(function(d) {
+	    	var count = formatCount(d.length); 
+	    	if (count == 0) {	return "";	}
+	    	else {	return count;	}
+	    });
 
-	g.selectAll(".legend_rect")
-          .data(color.domain())
+	g.selectAll(".legend_rect") // Display legend bars under X-Axis
+        	.data(color.domain())
         .enter().append("rect")
           .attr("class", "legend_rect")
           .attr("x", function(d, i) { return (.99*width/10)*(i); })
@@ -214,7 +213,7 @@ function create_chart(data, cutoff) {
           .attr("height", 10)
           .style("fill", function(d, i) { return color(d); });
 
-	g.append("g")
+	g.append("g") // Display X-Axis and X-Axis Label
 		.attr("class", "xAxis")
 	    .attr("transform", "translate(0," + height + ")")
 	    .call(d3.axisBottom(x))
@@ -226,49 +225,41 @@ function create_chart(data, cutoff) {
 			.text("Article Score")
 			.style("font-size","26");
 
-	g.append("g").append("text")
+	g.append("g").append("text") // Display Y-Axis Label
 		.attr("y", -30)
 		.attr("x", -1*height/2)
 		.attr("transform", "rotate(-90)")
 		.attr("text-anchor", "middle")
 		.style("fill", "white")
 		.style("font-weight", "bold")
-		.text("Article Count")
-		.style("font-size","26");
+		.style("font-size","26")
+		.text("Article Count");
 
-	g.append("g").append("text")
+	g.append("g").append("text") // Display Title
 		.attr("transform", "translate(" + .99*width/2 + "," + -1*(3/16*margin.bottom) + ")")
 		.attr("text-anchor", "middle")
 		.style("fill", "white")
 		.style("font-weight", "bold")
-		.text("What Am I Reading?")
-		.style("font-size","26");
+		.style("font-size","26")
+		.text("What Am I Reading?");
 
-	g.append("g")
-		.attr("class", "xAxis")
-	    .attr("transform", "translate(0," + height + ")")
-	    .call(d3.axisBottom(x))
-	    .append("text")
-			.attr("transform", "translate(" + width/20 + "," + (29/32*margin.bottom) + ")")
-			.attr("text-anchor", "middle")
-			.style("fill", "white")
-			.style("font-weight", "bold")
-			.text("Liberal")
-			.style("font-size","20");
+	g.append("g").append("text") // Display Liberal on left side of X-Axis
+		.attr("transform", "translate(" + width/20 + "," + (height + 29/32*margin.bottom) + ")")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.style("font-size","20")
+		.text("Liberal");
 
-	g.append("g")
-		.attr("class", "xAxis")
-	    .attr("transform", "translate(0," + height + ")")
-	    .call(d3.axisBottom(x))
-	    .append("text")
-			.attr("transform", "translate(" + .99*19*width/20 + "," + (29/32*margin.bottom) + ")")
-			.attr("text-anchor", "middle")
-			.style("fill", "white")
-			.style("font-weight", "bold")
-			.style("font-size","18")
-			.text("Conservative");
+	g.append("g").append("text") // Display Conservative on right side of X-Axis
+		.attr("transform", "translate(" + .99*19*width/20 + "," + (height + 29/32*margin.bottom) + ")")
+		.attr("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-weight", "bold")
+		.style("font-size","18")
+		.text("Conservative");
 
-	g.append("g").append("text")
+	g.append("g").append("text") // Display Average Score
 		.attr("transform", "translate(" + -width/20 + "," + -10/16*margin.top + ")")
 		.attr("text-anchor", "middle")
 		.style("fill", "white")
@@ -276,10 +267,10 @@ function create_chart(data, cutoff) {
 		.style("font-size","18")
 		.text("Average Score: \n " + averageScore);
 
-	g.append("g").append("text")
+	g.append("g").append("text") // Display Lean of Average Score
 		.attr("transform", "translate(" + -width/20 + "," + -7/16*margin.top + ")")
 		.attr("text-anchor", "middle")
-		.style("fill", "white")
+		.style("fill", color(averageScore))
 		.style("font-weight", "bold")
 		.style("font-size","18")
 		.text(function(i,d) {
@@ -290,7 +281,7 @@ function create_chart(data, cutoff) {
 		});
 };
 
-function change_chart(slider_value) {
+function change_chart(slider_value) { // Change values used in chart depending on where slider is placed
     $("#chart").remove();
     switch(slider_value) {
 	case 0:
@@ -309,8 +300,6 @@ function change_chart(slider_value) {
 	    create_chart(cachedArticles, 365);
     }
 };
-
-// create_chart(cachedArticles, 7);
 
 // Fetch the articles from the locale cache
 chrome.storage.sync.get("articles", function(storage) {
