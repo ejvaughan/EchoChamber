@@ -95,8 +95,8 @@ function displayBanner() {
         
 		box.html("<img id='loading' src='" + loadingImageURL + "'>" +
 			"<span id='label'></span>" +
-			"<div id='rightContainer'><a id='dashboard'>Open dashboard...</a>" +
-			"<img id='close' src='" + closeImageURL + "'></div>");
+			"<div id='rightContainer'><div id='buttonContainer'><button id='dashboard'>Open dashboard...</button>" +
+			"<img id='close' src='" + closeImageURL + "'></div></div>");
 
 		Boundary.loadBoxCSS("#ecbanner", chrome.runtime.getURL("banner_elements.css"));
 

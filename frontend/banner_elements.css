@@ -28,7 +28,6 @@ body {
 	width: 200px;
 
 	padding: 5px 10px 5px 10px;
-	line-height: 40px;
 
 	font-size: 12pt;
 	text-align: right;
@@ -37,13 +36,14 @@ body {
 #close {
 	width: 12px;
 	height: 12px;
-	vertical-align: middle;
 	margin-left: 10px;
 	padding-right: 5px;
-}
-
-a {
-	display: inline-block;
 	vertical-align: middle;
 }
 
+#buttonContainer {
+	position: absolute;
+	top: 50%;
+	right: 10;
+	transform: translateY(-50%);
+}
