@@ -142,7 +142,9 @@ function create_chart(data, cutoff) {
 	    }
 	});
 
-	var averageScore = (sumValues / values.length).toFixed(2);
+	console.log("Sum Values: " + sumValues);
+	console.log("Values Length: " + values.length);
+	var averageScore = (sumValues / values.length);
 	console.log("Average Score: " + averageScore);
 
 	console.log(values);
@@ -265,7 +267,7 @@ function create_chart(data, cutoff) {
 		.style("fill", "white")
 		.style("font-weight", "bold")
 		.style("font-size","18")
-		.text("Average Score: \n " + averageScore);
+		.text("Average Score: \n " + averageScore.toFixed(2));
 
 	g.append("g").append("text") // Display Lean of Average Score
 		.attr("transform", "translate(" + -width/20 + "," + -7/16*margin.top + ")")
