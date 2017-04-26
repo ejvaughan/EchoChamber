@@ -272,12 +272,13 @@ function create_chart(data, cutoff) {
 	g.append("g").append("text") // Display Lean of Average Score
 		.attr("transform", "translate(" + -width/20 + "," + -7/16*margin.top + ")")
 		.attr("text-anchor", "middle")
-		.style("fill", color(averageScore))
+		.style("fill", color(Math.floor(averageScore*10)/10))
 		.style("font-weight", "bold")
 		.style("font-size","18")
 		.text(function(i,d) {
 			if(averageScore < .35) { return "Liberal" }
-			else if(averageScore < .5) { return "Moderately Liberal" }
+			else if(averageScore < .45) { return "Moderately Liberal" }
+			else if(averageScore < .55) { return "Moderate" }
 			else if(averageScore < .65) { return "Moderately Conservative" }
 			else { return "Conservative" }
 		});
