@@ -27,9 +27,9 @@ function checkEcho(countThreshold, propThreshold, score, side) {
         var libProp = props.libCount / props.totalCount;
         var qualifiedCount = props.totalCount > countThreshold; // We only want to check periodically
         if(qualifiedCount && libProp > propThreshold) {
-            echomsg = toPercent(libProp) + "% of your news has been liberal. Consider checking out the other side!";
+            echomsg = toPercent(libProp) + "% of your last " + countThreshold + " news articles have been liberal. Consider checking out the other side!";
         } else if(qualifiedCount  && 1 - libProp > propThreshold) {
-            echomsg = toPercent(1 - libProp) + "% of your news has been conservative. Consider checking out the other side!";
+            echomsg = toPercent(1 - libProp) + "% of your last " + countThreshold + " news articles has been conservative. Consider checking out the other side!";
         } else {
             echomsg = null;
         }
@@ -59,7 +59,7 @@ function fetchScore() {
 	}, function(res) {
 		console.log("Got result: ");
         console.log(res);
-        var countThreshold = 20; // Number of articles before checking for echo chamber
+        var countThreshold = 5; // Number of articles before checking for echo chamber
 		var propThreshold = 0.7;
         checkEcho(countThreshold, propThreshold, res.score, res.side);
         chrome.storage.sync.get(["articles"], function(storage) {
