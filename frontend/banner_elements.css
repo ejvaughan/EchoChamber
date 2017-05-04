@@ -1,13 +1,12 @@
 body {
 	padding: 5px 10px 5px 10px;
-	line-height: 40px;
+	line-height: 50px;
 
 	background: -webkit-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
 
 	font-size: 14pt;
 	font-family: Arial, Helvetica, sans-serif;
 	color: black;
-	border-top: 1px solid #d3d3d3;
 }
 
 #loading {
@@ -18,6 +17,15 @@ body {
 #label {
 	display: inline-block;
 	vertical-align: middle;
+}
+
+#warningLabel {
+	display: inline-block;
+	vertical-align: middle;
+	text-align: center;
+	margin-top: 7.5%;
+	font-size: 15pt;
+	font-weight: bold;
 }
 
 #rightContainer {

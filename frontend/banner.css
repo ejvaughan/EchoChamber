@@ -3,7 +3,32 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	height: 50px;	
+	height: 60px;
 	width: 100%;
 	z-index: 999999999999999;
+	border-top: 1px solid #d3d3d3;
+}
+
+#warningBanner {
+	position: fixed;
+	bottom: 35%;
+	top: 35%;
+	left: 25%;
+	right: 25%;
+	height: 30%;
+	width: 50%;
+	z-index: 999999999999999;
+	border: 1px solid #d3d3d3;
+	background: red;
+}
+
+#greyBackground {
+	z-index: 2147483646;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0.5;
+	background: grey;
 }

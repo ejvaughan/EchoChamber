@@ -7,13 +7,12 @@ function displayScore(score, side) {
 	var percentage = toPercent(score)
 	box.find("#loading").fadeOut();
     box.find("#label").text(percentage.toFixed(0) + "% chance of being " + side);
-
 }
-
 
 function checkEcho(countThreshold, propThreshold, score, side) {
     chrome.storage.sync.get(["props"], function(storage){
-        var box = Boundary.findBox("#ecbanner");
+        // var box = Boundary.findBox("#ecbanner");
+        var warningBox = Boundary.findBox("#warningBanner");
         var props = storage.props;
         if (props == undefined) { //Catch both undefined and nulls
         	props = { 
@@ -36,11 +35,17 @@ function checkEcho(countThreshold, propThreshold, score, side) {
         if (echomsg === null) { // Don't show the score
         	displayScore(score, side);
         } else {
-            box.find("#loading").remove();
-            box.find("#label").text(echomsg); 
+            $("body").append("<div id='greyBackground'></div>");
+            
+            warningBox.find("#loading").remove();
+            warningBox.find("#warningLabel").text(echomsg);
+            // $("#warningBanner").css("background", "red");
+
             // TODO color the box so it POPS 
             setTimeout(function() {
-                displayScore(score, side) // Have to do it with anonymous function to pass score args
+                console.log("Hiding now!");
+                $("#warningBanner").hide();
+                $("#greyBackground").remove();
             }, 5000);
             props = null; // unset props so we can keep track of next period
         }
@@ -59,8 +64,8 @@ function fetchScore() {
 	}, function(res) {
 		console.log("Got result: ");
         console.log(res);
-        var countThreshold = 5; // Number of articles before checking for echo chamber
-		var propThreshold = 0.7;
+        var countThreshold = 1; // Number of articles before checking for echo chamber
+		var propThreshold = 0.55;
         checkEcho(countThreshold, propThreshold, res.score, res.side);
         chrome.storage.sync.get(["articles"], function(storage) {
             articles = storage.articles;
@@ -119,5 +124,33 @@ function displayBanner() {
     fetchScore();
 }
 
+function displayWarning() {
+    var box = Boundary.findBox("#warningBanner");
+    if (box.length === 0) {
+        var closeImageURL = chrome.runtime.getURL("close.svg");
+        var loadingImageURL = chrome.runtime.getURL("loading.svg");
+
+        box = Boundary.createBox("warningBanner");
+        var frame = $("#warningBanner").css("display", "none");
+        
+        box.html("<img id='loading' src='" + loadingImageURL + "'><span id='warningLabel'></span>");
+
+        Boundary.loadBoxCSS("#warningBanner", chrome.runtime.getURL("banner_elements.css"));
+
+        box.find("#loading").hide();
+
+        // Set up event listeners
+        box.find("#close").click(function() {
+            frame.fadeOut();
+        });
+    }
+
+    $("#warningBanner").fadeIn();
+
+    box.find("#loading").show();
+    fetchScore();
+}
+
 displayBanner();
+displayWarning();
 // chrome.storage.sync.clear();
